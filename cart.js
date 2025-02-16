@@ -1,9 +1,9 @@
-
 document.addEventListener("DOMContentLoaded", () => {
     fetchProducts();
 });
 
 let cart = [];
+let discount = 0;
 
 function fetchProducts() {
     fetch("https://fakestoreapi.com/products")
@@ -52,6 +52,7 @@ function updateCart() {
     const cartItems = document.getElementById("cart-items");
     const cartCount = document.getElementById("cart-count");
     const cartTotal = document.getElementById("cart-total");
+    const discountedTotal = document.getElementById("discounted-total");
 
     cartItems.innerHTML = "";
     let total = 0;
@@ -60,7 +61,7 @@ function updateCart() {
         total += item.price * item.quantity;
         cartItems.innerHTML += `
             <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>${item.title} - $${item.price * item.quantity}</span>
+                <span>${item.title} - $${(item.price * item.quantity).toFixed(2)}</span>
                 <div>
                     <button class="btn btn-sm btn-outline-secondary" onclick="changeQuantity(${item.id}, -1)">➖</button>
                     <span class="mx-2">${item.quantity}</span>
@@ -71,7 +72,10 @@ function updateCart() {
         `;
     });
 
+    const discountedPrice = total - (total * discount);
+
     cartTotal.textContent = total.toFixed(2);
+    discountedTotal.textContent = discountedPrice.toFixed(2);
     cartCount.textContent = cart.length;
 }
 
@@ -96,3 +100,19 @@ function clearCart() {
     updateCart();
 }
 
+function applyPromoCode() {
+    const promoInput = document.getElementById("promo-code").value.trim().toLowerCase();
+    const discountMessage = document.getElementById("discount-message");
+
+    if (promoInput === "ostad10") {
+        discount = 0.10;
+        discountMessage.textContent = "Promo code applied! 10% discount applied.";
+    } else if (promoInput === "ostad5") {
+        discount = 0.05;
+        discountMessage.textContent = "Promo code applied! 5% discount applied.";
+    } else {
+        discount = 0;
+        discountMessage.textContent = "Invalid promo code.";
+    }
+    updateCart();
+}
